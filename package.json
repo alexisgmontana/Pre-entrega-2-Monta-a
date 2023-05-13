@@ -1,0 +1,21 @@
+{
+  "name": "y",
+  "version": "1.0.0",
+  "description": "",
+  "main": "test.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexisgmontana/Pre-entrega-2-Monta-a.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alexisgmontana/Pre-entrega-2-Monta-a/issues"
+  },
+  "homepage": "https://github.com/alexisgmontana/Pre-entrega-2-Monta-a#readme"
+}

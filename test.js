@@ -1,4 +1,4 @@
-const fs = require("fs");
+import fs from "fs";
 
 class ProductManager {
   constructor(path) {
@@ -10,20 +10,48 @@ class ProductManager {
     }
     try {
       const data = fs.readFileSync(this.path, "utf-8");
-      this.products = JSON.parse(data);
+      const products = JSON.parse(data);
+      if (!Array.isArray(products)) {
+        throw new Error("El archivo no contiene una matriz de productos");
+      }
+      this.products = products;
     } catch (err) {
-      console.log(err);
+      throw new Error(`Error al leer ${this.path}: ${err.message}`);
     }
   }
 
   addProduct(product) {
-    const id =
-      this.products.length > 0
-        ? Math.max(...this.products.map((p) => p.id)) + 1
-        : 1;
-    this.products.push({ ...product, id });
-    fs.writeFileSync(this.path, JSON.stringify(this.products));
-    return console.log("success");
+    if (!product.title) {
+      throw new Error("Error, titulo necesario");
+    }
+    if (!product.description) {
+      throw new Error("Error, descripción necesaria");
+    }
+    if (!product.price) {
+      throw new Error("Error, precio necesario");
+    }
+    if (!product.thumnail) {
+      throw new Error("Error, ruta de imágen necesaria");
+    }
+    if (!product.code) {
+      throw new Error("Error, código necesario");
+    }
+    if (!product.stock) {
+      throw new Error("Error, stock necesario");
+    }
+    const codeValidation = this.products.some((p) => p.code === product.code);
+    if (codeValidation) {
+      throw new Error("Error, código repetido");
+    } else {
+      const id =
+        this.products.length > 0
+          ? Math.max(...this.products.map((p) => p.id)) + 1
+          : 1;
+      this.products.push({ ...product, id });
+      console.log(this.products);
+      fs.writeFileSync(this.path, JSON.stringify(this.products));
+      return console.log("success");
+    }
   }
 
   updateProduct(id, fields) {
@@ -38,11 +66,16 @@ class ProductManager {
   }
 
   getProducts() {
-    return this.products;
+    return JSON.parse(fs.readFileSync(this.path, "utf-8"));
   }
 
   getProductById(id) {
-    return this.products.find((p) => p.id === id);
+    const productId = JSON.parse(fs.readFileSync(this.path, "utf-8"));
+    const product = productId.find((p) => p.id === id);
+    if (!product) {
+      throw new Error(`Product with ID ${id} not found`);
+    }
+    return product;
   }
 
   deleteProduct(id) {
@@ -51,24 +84,63 @@ class ProductManager {
       this.products.splice(productIndex, 1);
       fs.writeFileSync(this.path, JSON.stringify(this.products));
     } else {
-      console.log("id not defined");
+      throw new Error(`Product with ID ${id} not found`);
     }
+    return;
   }
 }
 
-const product = new ProductManager("./products.json");
+// PRODUCTOS
+const product1 = {
+  title: "Remera Nike",
+  description: "Azul, talle L, mangas cortas",
+  price: 8000,
+  thumnail: "../toImage",
+  code: "BAC323",
+  stock: 7,
+};
+const product2 = {
+  title: "Remera Adidas",
+  description: "Roja, talle L, mangas cortas",
+  price: 7000,
+  thumnail: "../toImage",
+  code: "BDC125",
+  stock: 10,
+};
+const product3 = {
+  title: "Buso Nike",
+  description: "Negro, talle L",
+  price: 12000,
+  thumnail: "../toImage",
+  code: "ABA126",
+  stock: 2,
+};
+const product4 = {
+  title: "Remera Puma",
+  description: "Azul, talle L, mangas cortas",
+  price: 6000,
+  thumnail: "../toImage",
+  code: "FSC127",
+  stock: 3,
+};
+const product5 = {
+  title: "Campera Kappa",
+  description: "Blanca, talle L",
+  price: 16000,
+  thumnail: "../toImage",
+  code: "YRM558",
+  stock: 4,
+};
 
-// product.addProduct({
-//   title: "a",
-//   description: "b",
-//   price: 200,
-//   thumbnail: "./img.jpg",
-//   code: 1234,
-//   stock: 9,
-// });
+//INSTANCIAMOS Y AÑADIMOS
+const productsManager = new ProductManager("./products.json");
 
-// // product.deleteProduct(1);
-
-// product.updateProduct(7, { stock: 5 });
-
-// console.log(product.getProducts());
+/* try {
+  productsManager.addProduct(product1);
+  productsManager.addProduct(product2);
+  productsManager.addProduct(product3);
+  productsManager.addProduct(product4);
+  productsManager.addProduct(product5);
+} catch (error) {
+  console.log(error);
+} */
